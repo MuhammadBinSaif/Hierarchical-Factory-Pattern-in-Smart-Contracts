@@ -108,57 +108,37 @@ contract AccessControlManager{
         createNewContract(CLIENT_ROLE, _owner_address, _contract_address, _owner_address, _parent_address, _owner_name, _name, _parent_name, _contract_type);
         createNewContract(ADMIN_ROLE, signer,_contract_address, _owner_address, _parent_address, _owner_name, _name, _parent_name, _contract_type);
     }
-    // external function to update contract data struct and also user against specific contract
-    function updateClientContracts(
-        address _oldaddress, 
-        address _newaddress, 
-        address _parent_address,
-        bytes32 _parent_name,
-        uint256 _admin_index, 
-        uint256 _client_index,
-        bytes32 _name, 
-        uint8 _check
-    ) 
+    // external function to transfer ownership of ADMIN role to new address
+    function transferOwnership(address newAdmin) 
     external 
-    onlyAdmin()
+    onlyAdmin 
     {
-        ContractData[] storage clientcontracts = accesscontrol[CLIENT_ROLE][_oldaddress];
-        require(clientcontracts.length > 0, "I addr");
-        require(_client_index < clientcontracts.length, "I index");
-        ContractData[] storage admincontracts = accesscontrol[ADMIN_ROLE][AdminOwner];
-        clientcontracts[_client_index].name = _name;
-        admincontracts[_admin_index].name = _name;
-        clientcontracts[_client_index].parentContractAddress = _parent_address;
-        admincontracts[_admin_index].parentContractAddress = _parent_address;
-        clientcontracts[_client_index].parentName = _parent_name;
-        admincontracts[_admin_index].parentName = _parent_name;
-        if(_check != 0) {
-            for (uint i = 0; i < clientcontracts.length; i++) {
-                if (clientcontracts[i].ownerAddress == _oldaddress) {
-                    if(_oldaddress != _newaddress){
-                        clientcontracts[i].ownerAddress = _newaddress;
-                    }
-                    clientcontracts[i].ownerName = _name;
-                }
-            }
-            for (uint i = 2; i < admincontracts.length; i++) {
-                if (admincontracts[i].ownerAddress == _oldaddress) {
-                    if(_oldaddress != _newaddress){
-                        admincontracts[i].ownerAddress = _newaddress;
-                    }
-                    admincontracts[i].ownerName = _name;
-                }
-            }
-            if(_oldaddress != _newaddress){
-                accesscontrol[CLIENT_ROLE][_newaddress] = clientcontracts;
-                require(
-                    accesscontrol[CLIENT_ROLE][_newaddress].length == clientcontracts.length,
-                    "NS"
-                );
-                delete accesscontrol[CLIENT_ROLE][_oldaddress];
-            }
+        require(newAdmin != address(0), "Invalid address");
+        require(newAdmin != AdminOwner, "New admin must be different");
+
+        // Transfer all ContractData from the old admin to the new admin
+        ContractData[] storage oldAdminContracts = accesscontrol[ADMIN_ROLE][AdminOwner];
+        ContractData[] storage newAdminContracts = accesscontrol[ADMIN_ROLE][newAdmin];
+
+        for (uint i = 0; i < oldAdminContracts.length; i++) {
+            newAdminContracts.push(oldAdminContracts[i]);
         }
+
+        // Clear the old admin's ContractData
+        delete accesscontrol[ADMIN_ROLE][AdminOwner];
+
+        // Update the admin owner address
+        AdminOwner = newAdmin;
     }
+
+    //Function to revoke role of user 
+    function revokeRole(bytes32 role, address user) 
+    external 
+    onlyAdmin {
+        require(user != address(0), "Invalid address");
+        delete accesscontrol[role][user];
+    }
+
     // external function called by client to add new contracts and data in struct mapping      
     function addClientContracts(
         bytes32 _name, 

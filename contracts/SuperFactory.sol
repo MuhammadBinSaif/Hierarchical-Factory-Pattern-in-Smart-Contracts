@@ -12,12 +12,12 @@ contract SuperFactory {
     constructor(address _accesscontroladdress) {
         accessControlManager = AccessControlManager(_accesscontroladdress);
     }
-
+    //modifier to check admin role
     modifier checkAdmin() {
         require(accessControlManager.hasRole(accessControlManager.ADMIN_ROLE(), msg.sender), "NA");
         _;
     }
-
+    //function to create subfactories by ADMIN on behalf of clients
     function createClientContracts(
         address _client_owner_address,
         address _parent_address,

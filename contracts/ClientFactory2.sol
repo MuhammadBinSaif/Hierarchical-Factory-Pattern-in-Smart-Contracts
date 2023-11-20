@@ -9,15 +9,26 @@ contract ClientFactory2{
     {
         accessControlManager = AccessControlManager(_accesscontroladdress);
     }
+    // Modifier to check client role against caller
     modifier checkClient() 
     {
         require(accessControlManager.hasRole(accessControlManager.CLIENT_ROLE(), msg.sender), "NA");
         _;
     }
+    // Function to create sub factory
     function createClientFactory3(bytes32 _client2_name, bytes32 _owner_name, address _parent_address, bytes32 _parent_name, bytes32 _data, bytes memory _signature) 
     external 
     checkClient() 
     {
         accessControlManager.addClientContracts(_client2_name, _owner_name, address(new ClientFactory3(address(accessControlManager))), AccessControlManager.ContractType.clientfactory3, _parent_address, _parent_name, _data, _signature);
+    }
+    //Custom Function belongs to Client Factory 2
+    function customFunction1() 
+    external 
+    view
+    checkClient() 
+    returns (string memory) 
+    {
+        return ("Function inside factory 2 smart contract");
     }
 }
