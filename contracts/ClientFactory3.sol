@@ -5,7 +5,7 @@ import "./SmartContract1.sol";
 
 contract ClientFactory3{
     AccessControlManager private accessControlManager;
-
+    // constructor to recieve the access control manager contract address
     constructor(address _accesscontroladdress)
     {
         accessControlManager = AccessControlManager(_accesscontroladdress);
@@ -21,7 +21,7 @@ contract ClientFactory3{
     external 
     checkClient() 
     {
-        accessControlManager.addClientContracts(_smartcontract1_name, _owner_name, address(new SmartContract1(address(accessControlManager))), AccessControlManager.ContractType.smartcontract1, _parent_address, _parent_name, _data, _signature);
+        accessControlManager.createNewContract(_smartcontract1_name, _owner_name, address(new SmartContract1(address(accessControlManager))), AccessControlManager.ContractType.smartcontract1, _parent_address, _parent_name, _data, _signature);
     }
     //Custom Function belongs to Client Factory 3
     function customFunction1() 

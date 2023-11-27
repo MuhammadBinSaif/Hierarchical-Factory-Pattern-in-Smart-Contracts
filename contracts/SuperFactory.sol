@@ -8,7 +8,7 @@ import "./ClientLibrary3.sol";
 
 contract SuperFactory {
     AccessControlManager private accessControlManager;
-
+    // constructor to recieve the access control manager contract address
     constructor(address _accesscontroladdress) {
         accessControlManager = AccessControlManager(_accesscontroladdress);
     }
@@ -17,7 +17,7 @@ contract SuperFactory {
         require(accessControlManager.hasRole(accessControlManager.ADMIN_ROLE(), msg.sender), "NA");
         _;
     }
-    //function to create subfactories by ADMIN on behalf of clients
+    //function to create subfactories by ADMIN on behalf of clients by types
     function createClientContracts(
         address _client_owner_address,
         address _parent_address,
@@ -35,8 +35,9 @@ contract SuperFactory {
             contractAddress = ClientLibrary2.createClientFactory2(address(accessControlManager));
         } else {
             contractAddress = ClientLibrary3.createClientFactory3(address(accessControlManager));
-        } 
-        accessControlManager.addClientContract(
+        }
+        //function from acm to add new contracts on behalf of client
+        accessControlManager.addContractOnBehalfOf(
             contractAddress,
             _client_owner_address,
             _parent_address,

@@ -4,7 +4,7 @@ import "./AccessControlManager.sol";
 import "./ClientFactory2.sol";
 contract ClientFactory1{
     AccessControlManager private accessControlManager;
-
+    // constructor to recieve the access control manager contract address
     constructor(address _access_control_address)
     {
         accessControlManager = AccessControlManager(_access_control_address);
@@ -20,7 +20,7 @@ contract ClientFactory1{
     external 
     checkClient() 
     {
-        accessControlManager.addClientContracts(_client2_name, _owner_name, address(new ClientFactory2(address(accessControlManager))), AccessControlManager.ContractType.clientfactory2, _parent_address, _parent_name, _data, _signature);
+        accessControlManager.createNewContract(_client2_name, _owner_name, address(new ClientFactory2(address(accessControlManager))), AccessControlManager.ContractType.clientfactory2, _parent_address, _parent_name, _data, _signature);
     }
     //Custom Function belongs to Client Factory 1
     function customFunction1() 
